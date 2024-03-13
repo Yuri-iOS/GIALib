@@ -7,6 +7,9 @@
 
 import SwiftUI
 
+/// usage
+/// to save color inside AppStorage
+
 extension Color: RawRepresentable {
 
     public init?(rawValue: String) {

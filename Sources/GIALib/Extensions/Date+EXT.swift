@@ -8,6 +8,7 @@
 import Foundation
 
 extension Date {
+    
     public var millisecondsSince1970: Int64 {
         Int64((self.timeIntervalSince1970 * 1000.0).rounded())
     }
@@ -27,7 +28,6 @@ extension Date {
         formatter.dateFormat = "HH:mm"
         return formatter.string(from: self)
     }
-    
     
     public var tfHour: String {
         let formatter = DateFormatter()

@@ -7,7 +7,12 @@
 
 import Foundation
 
-public enum DebugLogger {
+/// usage
+/// DebugLogger.info("info text")
+/// DebugLogger.warning("warning text")
+/// DebugLogger.error("error text")
+
+enum DebugLogger {
     enum LogLevel {
         case info
         case warning
@@ -34,19 +39,19 @@ public enum DebugLogger {
         }
     }
     
-    public static func info(_ str: String, shouldLogContext: Bool = true, file: String = #file, function: String = #function, line: Int = #line) {
+    static func info(_ str: String, shouldLogContext: Bool = true, file: String = #file, function: String = #function, line: Int = #line) {
         let context = Context(file: file, function: function, line: line)
         DebugLogger.handleLog(level: .info, str: str.description, shouldLogContext: shouldLogContext, context: context)
     }
     
     
-    public static func warning(_ str: String, shouldLogContext: Bool = true, file: String = #file, function: String = #function, line: Int = #line) {
+    static func warning(_ str: String, shouldLogContext: Bool = true, file: String = #file, function: String = #function, line: Int = #line) {
         let context = Context(file: file, function: function, line: line)
         DebugLogger.handleLog(level: .warning, str: str.description, shouldLogContext: shouldLogContext, context: context)
     }
     
     
-    public static func error(_ str: String, shouldLogContext: Bool = true, file: String = #file, function: String = #function, line: Int = #line) {
+    static func error(_ str: String, shouldLogContext: Bool = true, file: String = #file, function: String = #function, line: Int = #line) {
         let context = Context(file: file, function: function, line: line)
         DebugLogger.handleLog(level: .error, str: str.description, shouldLogContext: shouldLogContext, context: context)
     }

@@ -8,7 +8,11 @@
 import SwiftUI
 
 extension View {
-    public func formBack() -> some View {
+    /// remove default background color, if ios > 16.0
+    /// inside view init append
+    /// UITableView.appearance().backgroundColor = 'color'
+
+    func formBack() -> some View {
         if #available(iOS 16.0, *) {
             return scrollContentBackground(.hidden)
         } else {
@@ -16,7 +20,12 @@ extension View {
         }
     }
     
-    public func paintTop() -> some View {
+    /// iside view init append
+    /// let navbarAppearance = UINavigationBarAppearance()
+    /// navbarAppearance.backgroundColor = UIColor(Color.'color')
+    /// UINavigationBar.appearance().standardAppearance = navbarAppearance
+
+    func paintTop() -> some View {
         if #available(iOS 16.0, *) {
             return toolbarBackground(Color.teal)
         } else {
@@ -24,7 +33,8 @@ extension View {
         }
     }
     
-    public func changeRootViewController(with viewController: UIViewController) {
+    /// if use scenedelegate, you can easely change controllers with animation
+    func changeRootViewController(with viewController: UIViewController) {
         DispatchQueue.main.async {
             let window = UIApplication.shared.connectedScenes.flatMap { ($0 as? UIWindowScene)?.windows ?? [] }.first { $0.isKeyWindow }
             window?.rootViewController = viewController
@@ -35,7 +45,8 @@ extension View {
         }
     }
     
-    public func placeholder(
+    /// custom placeholder
+    func placeholder(
         _ text: String,
         when shouldShow: Bool,
         alignment: Alignment = .leading) -> some View {
@@ -44,7 +55,7 @@ extension View {
         }
     
     
-    public func placeholder<Content: View>(
+    func placeholder<Content: View>(
         when shouldShow: Bool,
         alignment: Alignment = .leading,
         @ViewBuilder placeholder: () -> Content) -> some View {
@@ -58,7 +69,8 @@ extension View {
 }
 
 extension Image {
-    public func backgroundImage() -> some View {
+    /// fullscreen image background
+    func backgroundImage() -> some View {
         self
             .resizable()
             .aspectRatio(contentMode: .fill)

